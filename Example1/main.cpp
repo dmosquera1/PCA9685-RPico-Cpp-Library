@@ -28,26 +28,15 @@ int main() {
     uint8_t rawMessage[5][3] {{0x40, 0x00, 0x10}, {0x40, 0x07, 0xFF}, {0x40, 0x07, 0xFF}, {0x40, 0x08, 0xFF}, {0x40, 0x09, 0xFF}};
     int bytes = 0;
 
+    PCA1.setReg(0x00, 0xA0);
+    PCA1.setReg(0x01, 0x04);
+    PCA1.setReg(0x06, 0xFF);
+    PCA1.setReg(0x07, 0x0F);
+    PCA1.setReg(0x08, 0x0F);
+    PCA1.setReg(0x09, 0x08);
 
     while (1) {
-            //PCA1.sendMessage(message);
-
-            /*for (uint8_t i=0; i<0x7F; i++) {
-                printf("%X:  %d\n", i, i2c_write_blocking(i2c0, i, message[1], 2, false));
-            }
-            */
-            uint8_t message[2][2] = {{0x00, 0x10}, {0x07, 0xFF}};
-            PCA1.setReg(message[0]);
-            PCA1.setReg(message[1]);
-            printf("%X\n", PCA1.readReg(0x00));
-            /*i2c_write_raw_blocking(i2c0, rawMessage[1], 3);
-            i2c_write_raw_blocking(i2c0, rawMessage[2], 3);
-            i2c_write_raw_blocking(i2c0, rawMessage[3], 3);
-            */
-            /*printf("%d ", PCA1.sendMessage(message[1]));
-            printf("%d ", PCA1.sendMessage(message[2]));
-            printf("%d\n", PCA1.sendMessage(message[3]));
-            */
+            printf("Register 0x06: %X\nRegister 0x07: %X\nRegister 0xFE: %X\n", PCA1.readReg(0x06), PCA1.readReg(0x07), PCA1.readReg(0xFE));
             sleep_ms(1000);
     }
 }

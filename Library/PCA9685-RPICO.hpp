@@ -12,8 +12,9 @@ class PCA9685 {
             I2C_Address = address;
             I2C_Pins = i2c;
         }
-    uint8_t setReg(uint8_t* src);
-    uint8_t readReg(uint8_t src);
+    uint8_t setReg(uint8_t Register, uint8_t Value);
+    uint8_t readReg(uint8_t Register);
+    uint8_t setFrequency();
 };
 
 #endif
