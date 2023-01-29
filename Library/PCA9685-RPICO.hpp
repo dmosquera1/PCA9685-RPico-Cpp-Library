@@ -15,6 +15,8 @@ class PCA9685 {
     uint8_t setReg(uint8_t Register, uint8_t Value);
     uint8_t readReg(uint8_t Register);
     uint8_t setFrequency();
+    void setPWM_ON(uint16_t Value, uint8_t PWM);
+    void setPWM_OFF(uint16_t Value, uint8_t PWM);
 };
 
 #endif

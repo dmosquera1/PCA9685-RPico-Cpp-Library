@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "Example1"
+		},
+		{
+			"path": "Supplemental_Libraries"
 		}
 	],
 	"settings": {}

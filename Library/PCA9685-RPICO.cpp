@@ -16,3 +16,17 @@ uint8_t PCA9685::readReg(uint8_t Register) {
 uint8_t PCA9685::setFrequency() {
     
 }
+
+void PCA9685::setPWM_ON(uint16_t Value, uint8_t PWM) {
+    uint8_t msg[2] = {(uint8_t)Value, (uint8_t)(Value >> 8)};
+    uint8_t PWM_INDEX = PWM*4 + 6;
+    setReg(PWM_INDEX, msg[0]);
+    setReg(PWM_INDEX + 1, msg[1]);
+}
+
+void PCA9685::setPWM_OFF(uint16_t Value, uint8_t PWM) {
+    uint8_t msg[2] = {(uint8_t)Value, (uint8_t)(Value >> 8)};
+    uint8_t PWM_INDEX = PWM*4 + 6;
+    setReg(PWM_INDEX + 2, msg[0]);
+    setReg(PWM_INDEX + 3, msg[1]);
+}

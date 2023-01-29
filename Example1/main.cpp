@@ -9,34 +9,75 @@
 //#include <pico/binary_info/code.h>
 //#include "pico/multicore.h"
 
+//Supplemental Libraries
+#include "../Supplemental_Libraries/RotaryEncoderClass/RotaryEncoder.hpp"
+
 //Project Libraries
 #include "../Library/PCA9685-RPICO.hpp"
 
+#define RotaryEncoderA 6
+#define RotaryEncoderB 7
+#define RotaryEncoderSW 8
+
+PCA9685 PCA1(0x40, i2c0);
+
+//Diagnostic Timer Callback
+volatile bool timer_fired = false;
+bool alarm_callback(struct repeating_timer *t) {
+    printf("LED0_On: %d      LED0_Off: %d\n", ((PCA1.readReg(0x07)<<8) & 0x0FFF) + PCA1.readReg(0x06), ((PCA1.readReg(0x09)<<8) & 0x0FFF) + PCA1.readReg(0x08));
+    return true;
+}
+
 int main() {
 
+    //I2C Initialization
     stdio_init_all();
-
     i2c_init(i2c0, 100000);
     gpio_set_function(4, GPIO_FUNC_I2C);
     gpio_set_function(5, GPIO_FUNC_I2C);
     gpio_pull_up(4);
     gpio_pull_up(5);
+    
 
-    PCA9685 PCA1(0x40, i2c0);
+    //Rotary Encoder Initialization
+    gpio_set_dir(RotaryEncoderA, 0);
+    gpio_set_dir(RotaryEncoderB, 0);
+    gpio_set_dir(RotaryEncoderSW, 0);
+    gpio_pull_up(RotaryEncoderA);
+    gpio_pull_up(RotaryEncoderB);
+    gpio_pull_up(RotaryEncoderSW);
 
-    uint8_t message[3][2] = {{0x00, 0x10}, {0x07, 0xFF}, {0x06, 0xFF}};
-    uint8_t rawMessage[5][3] {{0x40, 0x00, 0x10}, {0x40, 0x07, 0xFF}, {0x40, 0x07, 0xFF}, {0x40, 0x08, 0xFF}, {0x40, 0x09, 0xFF}};
-    int bytes = 0;
+    int8_t Increment = 0;
+    RotaryEncoder r1(RotaryEncoderA, RotaryEncoderB, RotaryEncoderSW);
+
+
+    //PCA9785 Initialization
+    uint16_t PWM_VALUE_1 = 0, PWM_VALUE_2 = 0;
+    uint8_t mode = 0, R1_SW_Past = 0;
 
     PCA1.setReg(0x00, 0xA0);
     PCA1.setReg(0x01, 0x04);
-    PCA1.setReg(0x06, 0xFF);
-    PCA1.setReg(0x07, 0x0F);
-    PCA1.setReg(0x08, 0x0F);
-    PCA1.setReg(0x09, 0x08);
+
+    //Setting Up Diagnostic Timer Callback
+    struct repeating_timer timer;
+    add_repeating_timer_ms(1000, alarm_callback, NULL, &timer);
 
     while (1) {
-            printf("Register 0x06: %X\nRegister 0x07: %X\nRegister 0xFE: %X\n", PCA1.readReg(0x06), PCA1.readReg(0x07), PCA1.readReg(0xFE));
-            sleep_ms(1000);
+        r1.encoder_update();
+        Increment = r1.encoder_direction();
+        if (mode) {
+            PWM_VALUE_1 += Increment*8;
+            PCA1.setPWM_ON(PWM_VALUE_1, 0);
+        } else {
+            PCA1.setPWM_OFF(PWM_VALUE_2, 0);
+            PWM_VALUE_2 += Increment*8;
+        }
+
+        if (r1.encoder_switch() && R1_SW_Past == 0) {
+            mode = !mode;
+            R1_SW_Past = 1;
+        } else if (R1_SW_Past == 1) {
+            R1_SW_Past = 0;
+        }
     }
 }

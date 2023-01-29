@@ -16,6 +16,7 @@ pico_sdk_init()
 add_executable(${PROJECT_NAME} 
     main.cpp
     ../Library/PCA9685-RPICO.cpp
+    ../Supplemental_Libraries/RotaryEncoderClass/RotaryEncoder.cpp
 )
 
 # Create map/bin/hex/uf2 files
