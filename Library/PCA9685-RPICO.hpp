@@ -12,11 +12,22 @@ class PCA9685 {
             I2C_Address = address;
             I2C_Pins = i2c;
         }
+    //Sets the register inside the PCA9685 with address 'Register' to 'Value'
     uint8_t setReg(uint8_t Register, uint8_t Value);
-    uint8_t readReg(uint8_t Register);
-    uint8_t setFrequency();
+    //Returns the value of the register inside the PCA9685 with address 'Register'
+    uint8_t getReg(uint8_t Register);
+
+    void setFrequency();
+
+    //Sets the on-cycle duration of the PWM to 'Value'
     void setPWM_ON(uint16_t Value, uint8_t PWM);
+    //Sets the off-cycle duration of the PWM to 'Value'
     void setPWM_OFF(uint16_t Value, uint8_t PWM);
+
+    //Returns the duration of the PWM's on-cycle
+    uint16_t getPWM_ON(uint8_t PWM);
+    //Returns the duration of the PWM's off-cycle
+    uint16_t getPWM_OFF(uint8_t PWM);
 };
 
 #endif

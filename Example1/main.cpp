@@ -20,11 +20,13 @@
 #define RotaryEncoderSW 8
 
 PCA9685 PCA1(0x40, i2c0);
+uint16_t PWM_VALUE_1 = 0, PWM_VALUE_2 = 0;
 
 //Diagnostic Timer Callback
 volatile bool timer_fired = false;
 bool alarm_callback(struct repeating_timer *t) {
-    printf("LED0_On: %d      LED0_Off: %d\n", ((PCA1.readReg(0x07)<<8) & 0x0FFF) + PCA1.readReg(0x06), ((PCA1.readReg(0x09)<<8) & 0x0FFF) + PCA1.readReg(0x08));
+    printf("LED0_On: %d      LED0_Off: %d\n", PCA1.getPWM_ON(0), PCA1.getPWM_OFF(0));
+    printf("PWM_VALUE_1 = %d    PWM_VALUE_2 = %d\n", PWM_VALUE_1, PWM_VALUE_2);
     return true;
 }
 
@@ -52,8 +54,8 @@ int main() {
 
 
     //PCA9785 Initialization
-    uint16_t PWM_VALUE_1 = 0, PWM_VALUE_2 = 0;
-    uint8_t mode = 0, R1_SW_Past = 0;
+    
+    uint8_t Sweep_Up1 = 1, R1_SW_Past = 0;
 
     PCA1.setReg(0x00, 0xA0);
     PCA1.setReg(0x01, 0x04);
@@ -62,22 +64,23 @@ int main() {
     struct repeating_timer timer;
     add_repeating_timer_ms(1000, alarm_callback, NULL, &timer);
 
-    while (1) {
-        r1.encoder_update();
-        Increment = r1.encoder_direction();
-        if (mode) {
-            PWM_VALUE_1 += Increment*8;
-            PCA1.setPWM_ON(PWM_VALUE_1, 0);
-        } else {
-            PCA1.setPWM_OFF(PWM_VALUE_2, 0);
-            PWM_VALUE_2 += Increment*8;
-        }
+    PCA1.setPWM_ON(0, 0);
+    PCA1.setPWM_ON(0, 1);
+    //PCA1.setReg(0x06, 0xFF);
+    //PCA1.setReg(0x07, 0x0F);
+    
+    PCA1.setPWM_OFF(1, 0);
+    PCA1.setPWM_OFF(4095, 1);
 
-        if (r1.encoder_switch() && R1_SW_Past == 0) {
-            mode = !mode;
-            R1_SW_Past = 1;
-        } else if (R1_SW_Past == 1) {
-            R1_SW_Past = 0;
-        }
+    while (1) {
+        if (Sweep_Up1) PWM_VALUE_1 += 8;
+        if (PWM_VALUE_1 >= 4095) Sweep_Up1 = 0;
+        if (!Sweep_Up1) PWM_VALUE_1 -= 8;
+        if (PWM_VALUE_1 <= 0) Sweep_Up1 = 1;
+
+
+        PCA1.setPWM_OFF(PWM_VALUE_1, 0);
+        PCA1.setPWM_ON(PWM_VALUE_1, 1);
+        sleep_ms(5);
     }
 }
