@@ -2,6 +2,7 @@
 #define PCA9685_PICO_H
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
+#include <math.h>
 
 class PCA9685 {
     private:
@@ -17,7 +18,8 @@ class PCA9685 {
     //Returns the value of the register inside the PCA9685 with address 'Register'
     uint8_t getReg(uint8_t Register);
 
-    void setFrequency();
+    //Sets the frequency of all PWMs to 'Frequency' as long as 'Frequency' is between 24 and 1526
+    void setFrequency(double Frequency);
 
     //Sets the on-cycle duration of the PWM to 'Value'
     void setPWM_ON(uint16_t Value, uint8_t PWM);
@@ -28,6 +30,9 @@ class PCA9685 {
     uint16_t getPWM_ON(uint8_t PWM);
     //Returns the duration of the PWM's off-cycle
     uint16_t getPWM_OFF(uint8_t PWM);
+
+    //Sets the duty cycle of the PWM (Value is a number between 0 and 1)
+    void setPWM_Duty_Cycle(double Value, uint8_t PWM);
 };
 
 #endif
