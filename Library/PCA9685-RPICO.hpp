@@ -18,6 +18,9 @@ class PCA9685 {
     //Returns the value of the register inside the PCA9685 with address 'Register'
     uint8_t getReg(uint8_t Register);
 
+    //Sets the MODE registers of the PCA9685 to enable the PWM functionality of the chip, MODE register values are little-endian
+    void PCA_Start();
+
     //Sets the frequency of all PWMs to 'Frequency' as long as 'Frequency' is between 24 and 1526
     void setFrequency(double Frequency);
 

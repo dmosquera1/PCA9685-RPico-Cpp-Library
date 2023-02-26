@@ -31,6 +31,14 @@ void PCA9685::setFrequency(double Frequency) {
     }
 }
 
+void PCA9685::PCA_Start() {
+    //Set control register 1 to 10100000
+    setReg(0x00, 0xA0);
+    //Set control register 2 to 00000100
+    setReg(0x01, 0x04);
+}
+
+
 void PCA9685::setPWM_ON(uint16_t Value, uint8_t PWM) {
     //Make an array of two valid bytes out of the 16-bit 'Value' parameter
     uint8_t msg[2] = {(uint8_t)(Value), (uint8_t)(Value >> 8)};
