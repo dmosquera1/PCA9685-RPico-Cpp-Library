@@ -67,7 +67,7 @@ int main() {
             PWM_VALUE_2 += 0.005;
         }
 
-        //Assigning PWM Values to PWMs 0 and 1
+        //Assigning PWM Values to PWMs 0 and 1 (LEDs)
         PCA1.setPWM_Duty_Cycle(PWM_VALUE_1, 0);
         PCA1.setPWM_Duty_Cycle(PWM_VALUE_2, 1);
         sleep_ms(20);
